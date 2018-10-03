@@ -17,11 +17,19 @@
 @SCREEN
 D=A
 @i      // screen ptr
-M=D     // i = SCREEN (16394)
+M=D     // i = SCREEN (16384)
+
+// globle constant
+@I_MIN
+M=D     // MIN = SCREEN
+@24576  // MAX = SCREEN + (256-1)*32
+D=A
+@I_MAX
+M=D
 
 // screen fill type
 @BLACK
-M=1
+M=-1
 @WHITE
 M=0
 
@@ -35,15 +43,19 @@ D;JEQ   // if M[KBD] == 0: goto CLS
 @FILL
 0;JMP
 
-@INF_LOOP
-0;JMP   // infinite loop
-
 
 //* ----- fill screen ----- *//
 (FILL)
 D=M[BLACK]
 A=M[i]
 M=D     // RAM[i] = BLACK
+
+D=M[I_MAX]
+D=D-M[i]
+@INF_LOOP
+D;JEQ   // if i == I_MAX: goto INF_LOOP
+@i
+M=M+1   // else: i++
 
 @INF_LOOP
 0;JMP   // goto INF_LOOP
@@ -54,6 +66,13 @@ M=D     // RAM[i] = BLACK
 D=M[WHITE]
 A=M[i]
 M=D     // RAM[i] = WHITE
+
+D=M[I_MIN]
+D=M[i]-D
+@INF_LOOP
+D;JEQ   // if i == I_MIN: goto INF_LOOP
+@i
+M=M-1   // else: i--
 
 @INF_LOOP
 0;JMP   // goto INF_LOOP
